@@ -1,0 +1,205 @@
+1. Run four HTTPD Docker containers with distinct, meaningful names, and apply restart policies (NO, On-Failure, Always, and Unless-Stopped) to each of the four containers, respectively. 
+ Demonstrate that the restart policies function as expected.
+ 
+ ANS:-
+ ====================
+ 1) No Policy
+ =====================
+ 
+root@FARDIN:~# docker container run -itd --name my_test_httpd_container --restart no  httpd
+3bc5cd82ae9990447c3c5612d7c13a07db5347361c3776e3cb2b26dc8a17e508
+root@FARDIN:~# docker container ls
+CONTAINER ID   IMAGE     COMMAND              CREATED         STATUS         PORTS     NAMES
+3bc5cd82ae99   httpd     "httpd-foreground"   6 seconds ago   Up 5 seconds   80/tcp    my_test_httpd_container
+root@FARDIN:~# docker container stop  my_test_httpd_container
+my_test_httpd_container
+
+root@FARDIN:~# docker container ls -a
+CONTAINER ID   IMAGE     COMMAND              CREATED          STATUS                       PORTS     NAMES
+3bc5cd82ae99   httpd     "httpd-foreground"   48 seconds ago   Exited (0) 7 seconds ago               my_test_httpd_container
+192c566ca2cc   ubuntu    "/bin/bash"          6 minutes ago    Exited (137) 5 minutes ago             my_test_ubuntu_container
+========================
+2)On-Failure Policy
+========================
+
+root@FARDIN:~# docker container run -itd --name  my_test_httpd_container_02 --restart on-failure httpd
+001a608ed6cfde5005b700d2bf2a1c401e687677caa410d2d5fb8da74298f5ea
+root@FARDIN:~# docker container ls
+CONTAINER ID   IMAGE     COMMAND              CREATED         STATUS         PORTS     NAMES
+001a608ed6cf   httpd     "httpd-foreground"   8 seconds ago   Up 7 seconds   80/tcp    my_test_httpd_container_02
+root@FARDIN:~#
+root@FARDIN:~#
+root@FARDIN:~# docker container ls -a
+CONTAINER ID   IMAGE     COMMAND              CREATED          STATUS                     PORTS     NAMES
+001a608ed6cf   httpd     "httpd-foreground"   33 seconds ago   Up 32 seconds              80/tcp    my_test_httpd_container_02
+3bc5cd82ae99   httpd     "httpd-foreground"   4 minutes ago    Exited (0) 4 minutes ago             my_test_httpd_container
+root@FARDIN:~#
+root@FARDIN:~#
+root@FARDIN:~# docker container top  my_test_httpd_container_02
+UID                 PID                 PPID                C                   STIME               TTY                 TIME
+       CMD
+root                1955                1936                0                   12:44               pts/0               00:00:00            httpd -DFOREGROUND
+www-data            1978                1955                0                   12:44               pts/0               00:00:00            httpd -DFOREGROUND
+www-data            1979                1955                0                   12:44               pts/0               00:00:00            httpd -DFOREGROUND
+www-data            1980                1955                0                   12:44               pts/0               00:00:00            httpd -DFOREGROUND
+root@FARDIN:~#
+root@FARDIN:~#
+root@FARDIN:~# kill -9 1955
+root@FARDIN:~# docker container ls -a
+CONTAINER ID   IMAGE     COMMAND              CREATED              STATUS                     PORTS     NAMES
+001a608ed6cf   httpd     "httpd-foreground"   About a minute ago   Up 2 seconds               80/tcp    my_test_httpd_container_02
+3bc5cd82ae99   httpd     "httpd-foreground"   6 minutes ago        Exited (0) 5 minutes ago             my_test_httpd_container
+====================
+3)Always Policy
+====================
+root@FARDIN:~# docker container run --name my_test_httpd_container_03 --restart always httpd sleep 20
+root@FARDIN:~# docker container ls -a
+CONTAINER ID   IMAGE     COMMAND              CREATED          STATUS                      PORTS     NAMES
+9f8d65a1c383   httpd     "sleep 20"           26 seconds ago   Up 4 seconds                80/tcp    my_test_httpd_container_03
+001a608ed6cf   httpd     "httpd-foreground"   6 minutes ago    Up 5 minutes                80/tcp    my_test_httpd_container_02
+3bc5cd82ae99   httpd     "httpd-foreground"   11 minutes ago   Exited (0) 10 minutes ago             my_test_httpd_container
+root@FARDIN:~#
+root@FARDIN:~#
+root@FARDIN:~#
+root@FARDIN:~# docker inspect my_test_httpd_container_03 | grep -i restartcount
+        "RestartCount": 4,
+root@FARDIN:~#  docker container stop my_test_httpd_container_03
+my_test_httpd_container_03
+root@FARDIN:~# docker container ls -a
+CONTAINER ID   IMAGE     COMMAND              CREATED          STATUS                      PORTS     NAMES
+9f8d65a1c383   httpd     "sleep 20"           5 minutes ago    Exited (0) 9 seconds ago              my_test_httpd_container_03
+001a608ed6cf   httpd     "httpd-foreground"   11 minutes ago   Up 10 minutes               80/tcp    my_test_httpd_container_02
+3bc5cd82ae99   httpd     "httpd-foreground"   16 minutes ago   Exited (0) 15 minutes ago             my_test_httpd_container
+root@FARDIN:~# docker inspect my_test_httpd_container_03 | grep -i restartcount
+        "RestartCount": 14,
+==========================
+4)unless-stopped policy
+==========================
+root@FARDIN:~# docker container run -itd --name my_test_httpd_container_04  --restart unless-stopped httpd  sleep 10
+b41ab7af3c5e3e2e3b3fcf7f88e04ca3482af59e3f54dbcf62a04a2d57fba306
+root@FARDIN:~# docker container ls
+CONTAINER ID   IMAGE     COMMAND              CREATED          STATUS          PORTS     NAMES
+b41ab7af3c5e   httpd     "sleep 10"           8 seconds ago    Up 7 seconds    80/tcp    my_test_httpd_container_04
+001a608ed6cf   httpd     "httpd-foreground"   18 minutes ago   Up 16 minutes   80/tcp    my_test_httpd_container_02
+root@FARDIN:~#
+root@FARDIN:~#
+root@FARDIN:~# docker inspect my_test_httpd_container_04 | grep -i restartcount
+        "RestartCount": 2,
+root@FARDIN:~#
+root@FARDIN:~#
+root@FARDIN:~# docker container stop  my_test_httpd_container_04
+my_test_httpd_container_04
+root@FARDIN:~#
+root@FARDIN:~#
+root@FARDIN:~# docker container ls -a
+CONTAINER ID   IMAGE     COMMAND              CREATED              STATUS                      PORTS     NAMES
+b41ab7af3c5e   httpd     "sleep 10"           About a minute ago   Exited (0) 6 seconds ago              my_test_httpd_container_04
+9f8d65a1c383   httpd     "sleep 20"           13 minutes ago       Exited (0) 8 minutes ago              my_test_httpd_container_03
+001a608ed6cf   httpd     "httpd-foreground"   19 minutes ago       Up 18 minutes               80/tcp    my_test_httpd_container_02
+3bc5cd82ae99   httpd     "httpd-foreground"   24 minutes ago       Exited (0) 23 minutes ago             my_test_httpd_container
+
+=============================================================================================	
+	
+2. Change the restart policy of a above running container from the default to a custom policy using the docker update command. e.g. docker update --help
+
+root@FARDIN:~# docker update --restart on-failure my_test_httpd_container_02
+my_test_httpd_container_02
+root@FARDIN:~# docker container ls
+CONTAINER ID   IMAGE     COMMAND              CREATED          STATUS          PORTS     NAMES
+001a608ed6cf   httpd     "httpd-foreground"   37 minutes ago   Up 36 minutes   80/tcp    my_test_httpd_container_02
+
+root@FARDIN:~# docker inspect my_test_httpd_container_02 | grep Name
+        "Name": "/my_test_httpd_container_02",
+                "Name": "on-failure",
+            "Name": "overlay2"
+============================================================================================			
+
+	
+3. Launch an NGINX container with a meaningful name and expose it on the host's port 80.
+Create an "index.html" file containing the text "Hello there, Let's be the Team CloudEthiX," and copy the file to the container's "/usr/share/nginx/html/" location. 
+Access the container in a browser to verify that the webpage displays correctly.
+
+root@FARDIN:~# docker container run -itd -p 8088:80 --name my_nginx_container nginx
+577ebdc6caddc4a18f542893fa22c9435c2878dec81e4b867bc74c7ec46daabc
+
+root@FARDIN:~# docker container ls
+CONTAINER ID   IMAGE     COMMAND                  CREATED             STATUS             PORTS                                   NAMES
+577ebdc6cadd   nginx     "/docker-entrypoint.…"   13 seconds ago      Up 12 seconds      0.0.0.0:8088->80/tcp, :::8088->80/tcp   my_nginx_container
+d3236f40ab39   httpd     "httpd-foreground"       21 minutes ago      Up 21 minutes      80/tcp                                  matin
+001a608ed6cf   httpd     "httpd-foreground"       About an hour ago   Up About an hour   80/tcp                                  my_test_httpd_container_02
+root@FARDIN:~# echo "Hello there, Let's be the Team CloudEthiX," >index.html
+
+root@FARDIN:~#  docker container cp /root/index.html my_nginx_container://usr/share/nginx/html/
+Successfully copied 2.05kB to my_nginx_container://usr/share/nginx/html/
+root@FARDIN:~# ip r l
+default via 172.23.64.1 dev eth0 proto kernel
+172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1
+172.23.64.0/20 dev eth0 proto kernel scope link src 172.23.75.220
+root@FARDIN:~# curl 172.23.75.220:8088
+Hello there, Let's be the Team CloudEthiX,
+
+
+4. Run a docker container with CPU and Memory limit.  docker container run --help 
+ref links :- https://phoenixnap.com/kb/docker-memory-and-cpu-limit
+		      https://www.baeldung.com/ops/docker-memory-limit
+
+root@FARDIN:~#
+root@FARDIN:~# docker container run -itd --name ubuntu_container -m 512m ubuntu
+799367f9969b429b5538d012bcf4c0ac750fb4e006198792deee92e58f04082f
+root@FARDIN:~# docker container ls
+CONTAINER ID   IMAGE     COMMAND                  CREATED             STATUS             PORTS                                   NAMES
+799367f9969b   ubuntu    "/bin/bash"              57 seconds ago      Up 56 seconds                                              ubuntu_container
+
+root@FARDIN:~# docker container stats ubuntu_container
+CONTAINER ID   NAME               CPU %     MEM USAGE / LIMIT   MEM %     NET I/O     BLOCK I/O   PIDS
+799367f9969b   ubuntu_container   0.00%     844KiB / 512MiB     0.16%     796B / 0B   0B / 0B     1
+CONTAINER ID   NAME               CPU %     MEM USAGE / LIMIT   MEM %     NET I/O     BLOCK I/O   PIDS
+ docker container run -itd  --name nginx_container_01 --cpus=2 nginx
+60b7037ea2a9ff3a6512c829c266fa9760c41f00e1174473fd13b64add9d3079
+
+root@FARDIN:~# docker container exec -it nginx_container_01 lscpu
+
+=========================================================================================			  
+			  
+				
+5.  Update CPU and Memory of docker container using docker update.
+ref links :- https://docs.docker.com/engine/reference/commandline/update/
+
+root@FARDIN:~# docker container stats nginx_container_01
+CONTAINER ID   NAME                 CPU %     MEM USAGE / LIMIT     MEM %     NET I/O     BLOCK I/O   PIDS
+60b7037ea2a9   nginx_container_01   0.00%     4.531MiB / 3.704GiB   0.12%     936B / 0B   0B / 0B     5
+CONTAINER ID   NAME                 CPU %     MEM USAGE / LIMIT     MEM %     NET I/O     BLOCK I/O   PIDS
+60b7037ea2a9   nginx_container_01   0.00%     4.531MiB / 3.704GiB   0.12%     936B / 0B   0B / 0B     5
+CONTAINER ID   NAME                 CPU %     MEM USAGE / LIMIT     MEM %     NET I/O     BLOCK I/O   PIDS
+60b7037ea2a9   nginx_container_01   0.00%     4.531MiB / 3.704GiB   0.12%     936B / 0B   0B / 0B     5
+CONTAINER ID   NAME                 CPU %     MEM USAGE / LIMIT     MEM %     NET I/O     BLOCK I/O   PIDS
+60b7037ea2a9   nginx_container_01   0.00%     4.531MiB / 3.704GiB   0.12%     936B / 0B   0B / 0B     5
+
+root@FARDIN:~# docker container inspect nginx_container
+
+"CapAdd": null,
+            "CapDrop": null,
+            "CgroupnsMode": "host",
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 2000000000,
+
