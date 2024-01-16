@@ -1,0 +1,192 @@
+Docker Assignment 04
+1. Pull the Busy-box image to your local system, tag it, and push it to the Docker Hub repository "yourname_cloudethix_busybox.
+
+ANS:-
+root@FARDIN:~# docker image ls
+REPOSITORY                    TAG       IMAGE ID       CREATED        SIZE
+fardin31/fardin_docker_repo   v1        e0a50a9c8ebd   4 days ago     584MB
+fardin31/fardin_docker_repo   v2        e0a50a9c8ebd   4 days ago     584MB
+my_test_image                 latest    e0a50a9c8ebd   4 days ago     584MB
+busybox                       latest    9211bbaa0dbd   4 weeks ago    4.26MB
+ubuntu                        latest    174c8c134b2a   4 weeks ago    77.9MB
+nginx                         latest    d453dd892d93   2 months ago   187MB
+httpd                         latest    6fd77d7e5eb7   2 months ago   167MB
+root@FARDIN:~# docker image tag busybox:latest fardin31/
+fardin-cloudethix-busybox:v2
+Error parsing reference: "fardin31/" is not a valid repository/tag: invalid reference format
+fardin-cloudethix-busybox:v2: command not found
+root@FARDIN:~# docker image tag busybox:latest fardin31/fardin-cloudethix-busybox:v2
+root@FARDIN:~# docker image ls
+REPOSITORY                           TAG       IMAGE ID       CREATED        SIZE
+fardin31/fardin_docker_repo          v1        e0a50a9c8ebd   4 days ago     584MB
+fardin31/fardin_docker_repo          v2        e0a50a9c8ebd   4 days ago     584MB
+my_test_image                        latest    e0a50a9c8ebd   4 days ago     584MB
+busybox                              latest    9211bbaa0dbd   4 weeks ago    4.26MB
+fardin31/fardin-cloudethix-busybox   v2        9211bbaa0dbd   4 weeks ago    4.26MB
+ubuntu                               latest    174c8c134b2a   4 weeks ago    77.9MB
+nginx                                latest    d453dd892d93   2 months ago   187MB
+httpd                                latest    6fd77d7e5eb7   2 months ago   167MB
+
+root@FARDIN:~# docker image push fardin31/fardin-cloudethix-busybox:v2
+The push refers to repository [docker.io/fardin31/fardin-cloudethix-busybox]
+82ae998286b2: Layer already exists
+v2: digest: sha256:7de5fa822a9d1e507c36565ee0cf50c08faa64505461c844a3ce3944d23efa35 size: 527
+
+====================================================================================================
+
+ 
+2. In your project directory, create a Dockerfile (named Dockerfile) with the following content.
+		FROM nginx:latest
+		COPY custom-index.html /usr/share/nginx/html/index.html
+	Ensure you also have a file named custom-index.html in the same directory.
+	Build the Docker image using the Dockerfile you created and push it your repository. 
+	Delete the local image.
+	Start a new container using the custom Nginx image that you just pushed.
+	Map port 8080 on your host to port 80 in the container. Check the container page in browser.
+ANS:-
+	
+	
+root@FARDIN:/mnt/f/docker# touch Dockerfile
+root@FARDIN:/mnt/f/docker# vi Dockerfile
+root@FARDIN:/mnt/f/docker# touch custom-index.html
+root@FARDIN:/mnt/f/docker# vi custom-index.html
+	
+
+root@FARDIN:/mnt/f/docker# cat  custom-index.html
+<html>
+<body>
+
+<h1>Hello World</h1>
+
+<p>I am Fardin khan</p>
+
+</body>
+</html>	
+	
+	
+	root@FARDIN:/mnt/f/docker# ll
+total 0
+drwxrwxrwx 1 root root 512 Jan 16  2024 ./
+drwxrwxrwx 1 root root 512 Jan 15 10:49 ../
+drwxrwxrwx 1 root root 512 Jan 10 11:43 .git/
+-rwxrwxrwx 1 root root  74 Jan 16  2024 Dockerfile*
+-rwxrwxrwx 1 root root  78 Jan 16  2024 custom-index.html*
+drwxrwxrwx 1 root root 512 Jan 16  2024 ubuntu-nginx/
+root@FARDIN:/mnt/f/docker# less Dockerfile
+root@FARDIN:/mnt/f/docker# ls -a
+.  ..  .git  Dockerfile  custom-index.html  ubuntu-nginx
+root@FARDIN:/mnt/f/docker# docker image build -t fardin31/fardin_docker_repo:latest .
+[+] Building 0.2s (7/7) FINISHED                                                                                      docker:default
+ => [internal] load build definition from Dockerfile                                                                            0.1s
+ => => transferring dockerfile: 111B                                                                                            0.0s
+ => [internal] load .dockerignore                                                                                               0.0s
+ => => transferring context: 2B                                                                                                 0.0s
+ => [internal] load metadata for docker.io/library/nginx:latest                                                                 0.0s
+ => [internal] load build context                                                                                               0.0s
+ => => transferring context: 38B                                                                                                0.0s
+ => [1/2] FROM docker.io/library/nginx:latest                                                                                   0.0s
+ => CACHED [2/2] COPY custom-index.html /usr/share/nginx/html/index.html                                                        0.0s
+ => exporting to image                                                                                                          0.0s
+ => => exporting layers                                                                                                         0.0s
+ => => writing image sha256:d9b9c1a7763af333cdeec9040658c43daf211275086a0c3d5823c2771a6c3241                                    0.0s
+ => => naming to docker.io/fardin31/fardin_docker_repo:latest                                                                   0.0s
+root@FARDIN:/mnt/f/docker#
+root@FARDIN:/mnt/f/docker#
+root@FARDIN:/mnt/f/docker# docker images
+REPOSITORY                           TAG       IMAGE ID       CREATED          SIZE
+fardin31/fardin_docker_repo          latest    d9b9c1a7763a   10 minutes ago   187MB
+my_test_image                        latest    e0a50a9c8ebd   4 days ago       584MB
+fardin31/fardin-cloudethix-busybox   v2        9211bbaa0dbd   4 weeks ago      4.26MB
+busybox                              latest    9211bbaa0dbd   4 weeks ago      4.26MB
+ubuntu                               latest    174c8c134b2a   4 weeks ago      77.9MB
+nginx                                latest    d453dd892d93   2 months ago     187MB
+httpd                                latest    6fd77d7e5eb7   2 months ago     167MB
+
+root@FARDIN:/mnt/f/docker# docker push fardin31/fardin_docker_repo:latest
+The push refers to repository [docker.io/fardin31/fardin_docker_repo]
+5572d4b59cbc: Layer already exists
+b074db3b55e1: Layer already exists
+e50c68532c4a: Layer already exists
+f6ba584ca3ec: Layer already exists
+01aaa195cdad: Layer already exists
+2a13e6a7cca6: Layer already exists
+370869eba6e9: Layer already exists
+7292cf786aa8: Layer already exists
+latest: digest: sha256:0273ec8f30785920b5fd44cf0620fd504994ffce112e16b912d39704d9664ac5 size: 1985
+
+root@FARDIN:/mnt/f/docker# docker images
+REPOSITORY                           TAG       IMAGE ID       CREATED          SIZE
+fardin31/fardin_docker_repo          latest    d9b9c1a7763a   15 minutes ago   187MB
+my_test_image                        latest    e0a50a9c8ebd   4 days ago       584MB
+fardin31/fardin-cloudethix-busybox   v2        9211bbaa0dbd   4 weeks ago      4.26MB
+busybox                              latest    9211bbaa0dbd   4 weeks ago      4.26MB
+ubuntu                               latest    174c8c134b2a   4 weeks ago      77.9MB
+nginx                                latest    d453dd892d93   2 months ago     187MB
+httpd                                latest    6fd77d7e5eb7   2 months ago     167MB
+root@FARDIN:/mnt/f/docker#
+root@FARDIN:/mnt/f/docker#
+root@FARDIN:/mnt/f/docker# docker image rm fardin31/fardin_docker_repo
+Untagged: fardin31/fardin_docker_repo:latest
+Untagged: fardin31/fardin_docker_repo@sha256:0273ec8f30785920b5fd44cf0620fd504994ffce112e16b912d39704d9664ac5
+Deleted: sha256:d9b9c1a7763af333cdeec9040658c43daf211275086a0c3d5823c2771a6c3241
+root@FARDIN:/mnt/f/docker#
+root@FARDIN:/mnt/f/docker#
+root@FARDIN:/mnt/f/docker# docker images
+REPOSITORY                           TAG       IMAGE ID       CREATED        SIZE
+my_test_image                        latest    e0a50a9c8ebd   4 days ago     584MB
+fardin31/fardin-cloudethix-busybox   v2        9211bbaa0dbd   4 weeks ago    4.26MB
+busybox                              latest    9211bbaa0dbd   4 weeks ago    4.26MB
+ubuntu                               latest    174c8c134b2a   4 weeks ago    77.9MB
+nginx                                latest    d453dd892d93   2 months ago   187MB
+httpd                                latest    6fd77d7e5eb7   2 months ago   167MB
+
+root@FARDIN:/mnt/f/docker# docker container run -itd -p 8082:80 --name Custom_container fardin31/fardin_docker_repo:latest
+Unable to find image 'fardin31/fardin_docker_repo:latest' locally
+latest: Pulling from fardin31/fardin_docker_repo
+af107e978371: Already exists
+336ba1f05c3e: Already exists
+8c37d2ff6efa: Already exists
+51d6357098de: Already exists
+782f1ecce57d: Already exists
+5e99d351b073: Already exists
+7b73345df136: Already exists
+4fbcaf477a0b: Already exists
+Digest: sha256:0273ec8f30785920b5fd44cf0620fd504994ffce112e16b912d39704d9664ac5
+Status: Downloaded newer image for fardin31/fardin_docker_repo:latest
+bc7d4c2cf2de771c99612a986cadcc062203ee24cb078acada424487d157061f
+root@FARDIN:/mnt/f/docker#
+root@FARDIN:/mnt/f/docker#
+root@FARDIN:/mnt/f/docker# netstat -tunlp
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 0.0.0.0:8082            0.0.0.0:*               LISTEN      38793/docker-proxy
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      105/systemd-resolve
+tcp6       0      0 :::8082                 :::*                    LISTEN      38801/docker-proxy
+tcp6       0      0 :::80                   :::*                    LISTEN      246/apache2
+udp        0      0 127.0.0.53:53           0.0.0.0:*                           105/systemd-resolve
+udp        0      0 127.0.0.1:323           0.0.0.0:*                           -
+udp6       0      0 ::1:323                 :::*                                -
+root@FARDIN:/mnt/f/docker#
+root@FARDIN:/mnt/f/docker#
+root@FARDIN:/mnt/f/docker# docker container ls
+CONTAINER ID   IMAGE                                COMMAND                  CREATED         STATUS         PORTS
+               NAMES
+bc7d4c2cf2de   fardin31/fardin_docker_repo:latest   "/docker-entrypoint.…"   2 minutes ago   Up 2 minutes   0.0.0.0:8082->80/tcp, :::8082->80/tcp   Custom_container
+9f8d65a1c383   httpd                                "sleep 20"               5 days ago      Up 5 seconds   80/tcp
+               my_test_httpd_container_03
+
+root@FARDIN:/mnt/f/docker# curl localhost:8082
+<html>
+<body>
+
+<h1>Hello World</h1>
+
+<p>I am Fardin khan</p>
+
+</body>
+</html>
+
+======================================================================================================			   
+
+
+
