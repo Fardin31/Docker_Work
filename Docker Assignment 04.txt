@@ -2,15 +2,23 @@ Docker Assignment 04
 1. Pull the Busy-box image to your local system, tag it, and push it to the Docker Hub repository "yourname_cloudethix_busybox.
 
 ANS:-
-root@FARDIN:~# docker image ls
-REPOSITORY                    TAG       IMAGE ID       CREATED        SIZE
-fardin31/fardin_docker_repo   v1        e0a50a9c8ebd   4 days ago     584MB
-fardin31/fardin_docker_repo   v2        e0a50a9c8ebd   4 days ago     584MB
-my_test_image                 latest    e0a50a9c8ebd   4 days ago     584MB
-busybox                       latest    9211bbaa0dbd   4 weeks ago    4.26MB
-ubuntu                        latest    174c8c134b2a   4 weeks ago    77.9MB
-nginx                         latest    d453dd892d93   2 months ago   187MB
-httpd                         latest    6fd77d7e5eb7   2 months ago   167MB
+root@FARDIN:/mnt/d/docker_work# docker image pull busybox
+Using default tag: latest
+latest: Pulling from library/busybox
+Digest: sha256:ba76950ac9eaa407512c9d859cea48114eeff8a6f12ebaa5d32ce79d4a017dd8
+Status: Downloaded newer image for busybox:latest
+docker.io/library/busybox:latest
+root@FARDIN:/mnt/d/docker_work# docker images
+REPOSITORY                           TAG       IMAGE ID       CREATED          SIZE
+fardin31/fardin_docker_repo          latest    d9b9c1a7763a   57 minutes ago   187MB
+my_test_image                        latest    e0a50a9c8ebd   4 days ago       584MB
+fardin31/fardin-cloudethix-busybox   v2        9211bbaa0dbd   4 weeks ago      4.26MB
+busybox                              latest    9211bbaa0dbd   4 weeks ago      4.26MB
+ubuntu                               latest    174c8c134b2a   4 weeks ago      77.9MB
+nginx                                latest    d453dd892d93   2 months ago     187MB
+httpd                                latest    6fd77d7e5eb7   2 months ago     167MB
+
+                     
 root@FARDIN:~# docker image tag busybox:latest fardin31/
 fardin-cloudethix-busybox:v2
 Error parsing reference: "fardin31/" is not a valid repository/tag: invalid reference format
@@ -186,7 +194,8 @@ root@FARDIN:/mnt/f/docker# curl localhost:8082
 </body>
 </html>
 
-======================================================================================================			   
+======================================================================================================
+			   
 
 
 
