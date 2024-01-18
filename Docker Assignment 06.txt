@@ -1,0 +1,207 @@
+**Task List: Docker Image Creation and Deployment**
+ 
+1. **Create Directories:**
+   - Establish two directories named "DHUB" and "AWSECR."
+ANS:-
+root@FARDIN:/mnt/f/test# mkdir DHUB
+root@FARDIN:/mnt/f/test# mkdir AWSECR
+===================================================================================================   
+ 
+2. **Dockerfile Creation:**
+   - Develop two Dockerfiles to construct custom images with the following specifications:
+     - Base image: Ubuntu
+     - Install packages: httpd
+     - Add "I am from Docker Hub" to the index.html file for DHUB directory and "I am from ECR" for AWSECR directory.
+     - Set environment variable ENV_NAME=DHUB for the DHUB directory and ENV_NAME=AWSECR for the AWSECR directory.
+  - Start http service using ENTRYPOINT 
+  -  Expose port 80.
+ANS:-
+root@FARDIN:/mnt/f/test# cd DHUB/
+root@FARDIN:/mnt/f/test/DHUB# ll
+total 0
+drwxrwxrwx 1 root root 512 Jan 18  2024 ./
+drwxrwxrwx 1 root root 512 Jan 18  2024 ../
+
+root@FARDIN:/mnt/f/test/DHUB# ll
+total 8
+drwxrwxrwx 1 root root  512 Jan 18 19:32 ./
+drwxrwxrwx 1 root root  512 Jan 18 14:57 ../
+-rwxrwxrwx 1 root root  222 Jan 18 19:32 Dockerfile*
+-rwxrwxrwx 1 root root 7224 Oct 26 19:14 apache2.conf*
+-rwxrwxrwx 1 root root   21 Jan 18 16:53 index.html*
+
+root@FARDIN:/mnt/f/test/DHUB# cat Dockerfile
+FROM ubuntu:latest
+WORKDIR /var/www/html/
+RUN apt update && apt install apache2 -y
+COPY index.html .
+COPY apache2.conf  /etc/apache2/apache2.conf
+ENV ENV_NAME=DHUB
+ENTRYPOINT ["apache2ctl", "-D", "FOREGROUND"]
+EXPOSE 80
+
+root@FARDIN:/mnt/f/test/DHUB# cat index.html
+I am from Docker Hub
+root@FARDIN:/mnt/f/test/DHUB#
+
+root@FARDIN:/mnt/f/test/DHUB# cp -pr apache2.conf index.html  /mnt/f/test/AWSECR/
+root@FARDIN:/mnt/f/test/DHUB# cd ../AWSECR/
+root@FARDIN:/mnt/f/test/AWSECR# ll
+total 8
+drwxrwxrwx 1 root root  512 Jan 18 19:48 ./
+drwxrwxrwx 1 root root  512 Jan 18 14:57 ../
+-rwxrwxrwx 1 root root  209 Jan 18 15:45 Dockerfile*
+-rwxrwxrwx 1 root root 7224 Oct 26 19:14 apache2.conf*
+-rwxrwxrwx 1 root root   21 Jan 18 16:53 index.html*
+root@FARDIN:/mnt/f/test/AWSECR#
+root@FARDIN:/mnt/f/test/AWSECR#
+root@FARDIN:/mnt/f/test/AWSECR# vi index.html
+root@FARDIN:/mnt/f/test/AWSECR# cat index.html
+I am from ECR
+root@FARDIN:/mnt/f/test/AWSECR# vi Dockerfile
+root@FARDIN:/mnt/f/test/AWSECR# cat Dockerfile
+FROM ubuntu:latest
+WORKDIR /var/www/html/
+RUN apt update && apt install apache2 -y
+COPY index.html .
+COPY apache2.conf  /etc/apache2/apache2.conf
+ENV ENV_NAME=AWSECR
+ENTRYPOINT ["apache2ctl", "-D", "FOREGROUND"]
+EXPOSE 80
+
+============================================================================== 
+3. **Build Custom Images:**
+   - Utilize the docker build command to build the custom images.
+   - List all available images using docker images.
+ANS:- 
+
+root@FARDIN:/mnt/f/test/DHUB# docker image build  -t fardin31/fardin_docker_repo:v1 .
+[+] Building 0.1s (10/10) FINISHED                                                                                    docker:default
+ => [internal] load build definition from Dockerfile                                                                            0.0s
+ => => transferring dockerfile: 261B                                                                                            0.0s
+ => [internal] load .dockerignore                                                                                               0.0s
+ => => transferring context: 2B                                                                                                 0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:latest                                                                0.0s
+ => [internal] load build context                                                                                               0.0s
+ => => transferring context: 63B                                                                                                0.0s
+ => [1/5] FROM docker.io/library/ubuntu:latest                                                                                  0.0s
+ => CACHED [2/5] WORKDIR /var/www/html/                                                                                         0.0s
+ => CACHED [3/5] RUN apt update && apt install apache2 -y                                                                       0.0s
+ => CACHED [4/5] COPY index.html .                                                                                              0.0s
+ => CACHED [5/5] COPY apache2.conf  /etc/apache2/apache2.conf                                                                   0.0s
+ => exporting to image                                                                                                          0.0s
+ => => exporting layers                                                                                                         0.0s
+ => => writing image sha256:e0b8b330b227834b2881ba6e21ea585cd926d3735defb66d073f7e2a78b2a9cc                                    0.0s
+ => => naming to docker.io/fardin31/fardin_docker_repo:v1                                                                       0.0s
+ 
+root@FARDIN:/mnt/f/test/AWSECR# ll
+total 8
+drwxrwxrwx 1 root root  512 Jan 18 19:50 ./
+drwxrwxrwx 1 root root  512 Jan 18 14:57 ../
+-rwxrwxrwx 1 root root  222 Jan 18 19:50 Dockerfile*
+-rwxrwxrwx 1 root root 7224 Oct 26 19:14 apache2.conf*
+-rwxrwxrwx 1 root root   14 Jan 18 19:48 index.html*
+root@FARDIN:/mnt/f/test/AWSECR#
+
+root@FARDIN:/mnt/f/test/AWSECR# aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 905418468133.dkr.ecr.us-east-1.amazonaws.com
+WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+
+
+root@FARDIN:/mnt/f/test/AWSECR# docker image build -t 905418468133.dkr.ecr.us-east-1.amazonaws.com/aws_repo:v1 .
+[+] Building 0.3s (10/10) FINISHED                                                                                    docker:default
+ => [internal] load build definition from Dockerfile                                                                            0.1s
+ => => transferring dockerfile: 261B                                                                                            0.0s
+ => [internal] load .dockerignore                                                                                               0.1s
+ => => transferring context: 2B                                                                                                 0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:latest                                                                0.0s
+ => [1/5] FROM docker.io/library/ubuntu:latest                                                                                  0.0s
+ => [internal] load build context                                                                                               0.0s
+ => => transferring context: 7.32kB                                                                                             0.0s
+ => CACHED [2/5] WORKDIR /var/www/html/                                                                                         0.0s
+ => CACHED [3/5] RUN apt update && apt install apache2 -y                                                                       0.0s
+ => [4/5] COPY index.html .                                                                                                     0.0s
+ => [5/5] COPY apache2.conf  /etc/apache2/apache2.conf                                                                          0.1s
+ => exporting to image                                                                                                          0.1s
+ => => exporting layers                                                                                                         0.1s
+ => => writing image sha256:cf8896db59621306aa0b00dfe36834640ee98f12e777fd99f7b8f158293a5d67                                    0.0s
+ => => naming to 905418468133.dkr.ecr.us-east-1.amazonaws.com/aws_repo:v1                                                       0.0s
+ 
+
+root@FARDIN:/mnt/f/test/AWSECR# docker images
+REPOSITORY                                              TAG       IMAGE ID       CREATED          SIZE
+905418468133.dkr.ecr.us-east-1.amazonaws.com/aws_repo   v1        cf8896db5962   52 seconds ago   233MB
+fardin31/fardin_docker_repo                             v1        e0b8b330b227   43 minutes ago   233MB
+======================================================================================================= 
+
+4. **Push Images to Repositories:**
+   - Push the Docker image to Docker Hub.
+ANS:- 
+
+root@FARDIN:/mnt/f/test/DHUB# docker push fardin31/fardin_docker_repo:v1
+The push refers to repository [docker.io/fardin31/fardin_docker_repo]
+1696f9aa25a4: Pushed
+1458e185b895: Pushed
+31af1fe2b35e: Pushed
+fa0503915a0d: Pushed
+a1360aae5271: Mounted from library/ubuntu
+v1: digest: sha256:071e0bfb5ee54aaf6d7da93747087c744608aeb18cd259612e86af18524b3854 size: 1363
+
+   
+   - Push the Docker image to AWS ECR.
+   
+ANS:-
+
+root@FARDIN:/mnt/f/test/AWSECR# docker push 905418468133.dkr.ecr.us-east-1.amazonaws.com/aws_repo:v1
+The push refers to repository [905418468133.dkr.ecr.us-east-1.amazonaws.com/aws_repo]
+10263052ce00: Pushed
+8da0bdc7b147: Pushed
+31af1fe2b35e: Pushed
+fa0503915a0d: Pushed
+a1360aae5271: Pushed
+v1: digest: sha256:79d6fa33099ded049b06b249730d68364caf961d7387a1a70310de9ae88d422b size: 1363
+   
+ 
+5. **Run Containers:**
+   - Execute a container from the Docker Hub image, naming it "I_AM_FROM_DHUB," and mapping host port 8081 to the container.
+ 
+ANS:-
+root@FARDIN:/mnt/f/test/DHUB# docker run -itd -p 8081:80 --name I_AM_FROM_DHUB fardin31/fardin_docker_repo:v1
+37fb85ae4af30c6e3963572a2b22b89721f4f25e3ac8cd6185e23684be516f3f
+root@FARDIN:/mnt/f/test/DHUB#
+root@FARDIN:/mnt/f/test/DHUB#
+root@FARDIN:/mnt/f/test/DHUB# docker container ls
+CONTAINER ID   IMAGE                            COMMAND                  CREATED          STATUS          PORTS
+             NAMES
+37fb85ae4af3   fardin31/fardin_docker_repo:v1   "apache2ctl -D FOREG…"   28 seconds ago   Up 27 seconds   0.0.0.0:8081->80/tcp, :::8081->80/tcp   I_AM_FROM_DHUB
+
+   
+ 
+ - Execute a container from the AWS ECR image, naming it "I_AM_FROM_ECR," and mapping host port 8082 to the container.
+ 
+
+root@FARDIN:/mnt/f/test/AWSECR# docker run -itd -p 8082:80 --name I_AM_FROM_ECR 905418468133.dkr.ecr.us-east-1.amazonaws.com/aws_repo:v1
+ad3a34557c758115fec661e3f9c61e35d66b268c4d330cfd58039f8c99d7f5c4
+root@FARDIN:/mnt/f/test/AWSECR# docker container ls
+CONTAINER ID   IMAGE                                                      COMMAND                  CREATED          STATUS          PORTS                                   NAMES
+ad3a34557c75   905418468133.dkr.ecr.us-east-1.amazonaws.com/aws_repo:v1   "apache2ctl -D FOREG…"   11 seconds ago   Up 10 seconds   0.0.0.0:8082->80/tcp, :::8082->80/tcp   I_AM_FROM_ECR
+37fb85ae4af3   fardin31/fardin_docker_repo:v1                             "apache2ctl -D FOREG…"   2 minutes ago    Up 2 minutes    0.0.0.0:8081->80/tcp, :::8081->80/tcp   I_AM_FROM_DHUB
+
+ANS:-
+ 
+6. **Access Pages from Browser:**
+   - Open a web browser and access the pages:
+     - For Docker Hub: http://localhost:8081
+     - For AWS ECR: http://localhost:8082
+ ANS:-
+ root@FARDIN:/mnt/f/test/AWSECR# curl localhost:8081
+I am from Docker Hub
+root@FARDIN:/mnt/f/test/AWSECR#
+root@FARDIN:/mnt/f/test/AWSECR#
+root@FARDIN:/mnt/f/test/AWSECR# curl localhost:8082
+I am from ECR
+root@FARDIN:/mnt/f/test/AWSECR#
+========================================================================================================

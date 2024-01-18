@@ -368,7 +368,7 @@ v1: digest: sha256:9ceac672f55cdad7316651fcced0d6a1ba44e87454ec86236cb3bca647e41
 ================================================================================================
 
 							 
-	05. Dockerfile creation: Create a simple Dockerfile to build a custom image with the following specifications:
+05. Dockerfile creation: Create a simple Dockerfile to build a custom image with the following specifications:
 			1. Base image: Ubuntu
 			2. Install packages: curl, vim, and git
 		    3. Set an environment variable: MY_NAME=Your_Name
