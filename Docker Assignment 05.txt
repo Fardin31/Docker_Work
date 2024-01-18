@@ -1,0 +1,428 @@
+01. Push the Redis images tagged as version 1 and 3 to your Docker Hub repository, named "yourname_cloudethix_redis."
+
+ANS:-
+root@FARDIN:/mnt/f/docker# docker pull redis
+Using default tag: latest
+latest: Pulling from library/redis
+2f44b7a888fa: Pull complete
+c55535369ffc: Pull complete
+3622841bf0aa: Pull complete
+91a62ca7377a: Pull complete
+fdd219d1f4ab: Pull complete
+fdf07fe2fb4c: Pull complete
+4f4fb700ef54: Pull complete
+fba604e70bfe: Pull complete
+Digest: sha256:b5ddcd52d425a8e354696c022f392fe45fca928f68d6289e6bb4a709c3a74668
+Status: Downloaded newer image for redis:latest
+docker.io/library/redis:latest
+root@FARDIN:/mnt/f/docker# docker images
+REPOSITORY                           TAG       IMAGE ID       CREATED        SIZE
+fardin31/fardin_docker_repo          latest    d9b9c1a7763a   23 hours ago   187MB
+my_test_image                        latest    e0a50a9c8ebd   5 days ago     584MB
+redis                                latest    bdff4838c172   7 days ago     138MB
+fardin31/fardin-cloudethix-busybox   v2        9211bbaa0dbd   4 weeks ago    4.26MB
+busybox                              latest    9211bbaa0dbd   4 weeks ago    4.26MB
+ubuntu                               latest    174c8c134b2a   5 weeks ago    77.9MB
+nginx                                latest    d453dd892d93   2 months ago   187MB
+httpd                                latest    6fd77d7e5eb7   2 months ago   167MB
+
+root@FARDIN:/mnt/f/docker# docker image tag redis:latest fardin31/fardin_cloudethix_redis:v1
+root@FARDIN:/mnt/f/docker# docker image tag redis:latest fardin31/fardin_cloudethix_redis:v3
+root@FARDIN:/mnt/f/docker# docker images
+REPOSITORY                           TAG       IMAGE ID       CREATED        SIZE
+fardin31/fardin_docker_repo          latest    d9b9c1a7763a   23 hours ago   187MB
+my_test_image                        latest    e0a50a9c8ebd   5 days ago     584MB
+fardin31/fardin_cloudethix_redis     v1        bdff4838c172   7 days ago     138MB
+fardin31/fardin_cloudethix_redis     v3        bdff4838c172   7 days ago     138MB
+redis                                latest    bdff4838c172   7 days ago     138MB
+fardin31/fardin-cloudethix-busybox   v2        9211bbaa0dbd   4 weeks ago    4.26MB
+busybox                              latest    9211bbaa0dbd   4 weeks ago    4.26MB
+ubuntu                               latest    174c8c134b2a   5 weeks ago    77.9MB
+nginx                                latest    d453dd892d93   2 months ago   187MB
+httpd                                latest    6fd77d7e5eb7   2 months ago   167MB
+
+root@FARDIN:/mnt/f/docker# docker push fardin31/fardin_cloudethix_redis:v1
+The push refers to repository [docker.io/fardin31/fardin_cloudethix_redis]
+cd02e5942a1e: Mounted from library/redis
+5f70bf18a086: Mounted from library/redis
+fcae66387b13: Mounted from library/redis
+cbc573a5c422: Mounted from library/redis
+116584210380: Mounted from library/redis
+c95bcf9f626e: Mounted from library/redis
+2361aeb2c69c: Mounted from library/redis
+571ade696b26: Mounted from library/redis
+v1: digest: sha256:5d5d31a84c7fec11a3c8a29b04b1712f650a98338f6a51152de42459ea24060b size: 1986
+root@FARDIN:/mnt/f/docker# docker push fardin31/fardin_cloudethix_redis:v3
+The push refers to repository [docker.io/fardin31/fardin_cloudethix_redis]
+cd02e5942a1e: Layer already exists
+5f70bf18a086: Layer already exists
+fcae66387b13: Layer already exists
+cbc573a5c422: Layer already exists
+116584210380: Layer already exists
+c95bcf9f626e: Layer already exists
+2361aeb2c69c: Layer already exists
+571ade696b26: Layer already exists
+v3: digest: sha256:5d5d31a84c7fec11a3c8a29b04b1712f650a98338f6a51152de42459ea24060b size: 1986
+
+======================================================================================================
+02. Create a remote Git repository and add the Dockerfile and index.html files. Clone the repository locally and create a release branch. 
+              Build the Docker image from the release branch with a meaningful tag, then run a container from the image and expose it on host port 8383. 
+              Check the webpage in a browser, and upon success, push the image to your Docker Hub repository named "yourname_cloudethix_nginx." 
+              Finally, push the release branch to the remote Git repository and merge it by creating a pull request.
+
+ANS:-
+
+root@FARDIN:/mnt/f/docker_assignment# git clone git@github.com:Fardin31/Docker_Assignment.git
+Cloning into 'Docker_Assignment'...
+remote: Enumerating objects: 11, done.
+remote: Counting objects: 100% (11/11), done.
+remote: Compressing objects: 100% (9/9), done.
+remote: Total 11 (delta 2), reused 3 (delta 0), pack-reused 0
+Receiving objects: 100% (11/11), done.
+Resolving deltas: 100% (2/2), done.
+
+root@FARDIN:/mnt/f/Docker_Assignment# git branch -l
+* main
+root@FARDIN:/mnt/f/Docker_Assignment# git checkout -b release
+Switched to a new branch 'release'
+root@FARDIN:/mnt/f/Docker_Assignment# ll
+total 0
+drwxrwxrwx 1 root root 512 Jan 17  2024 ./
+drwxrwxrwx 1 root root 512 Jan 17  2024 ../
+drwxrwxrwx 1 root root 512 Jan 17  2024 .git/
+-rwxrwxrwx 1 root root  74 Jan 17  2024 Dockerfile*
+-rwxrwxrwx 1 root root  19 Jan 17  2024 README.md*
+-rwxrwxrwx 1 root root  78 Jan 17  2024 custom-index.html*
+
+root@FARDIN:/mnt/f/Docker_Assignment# cat Dockerfile
+FROM nginx:latest
+COPY custom-index.html /usr/share/nginx/html/index.html
+
+root@FARDIN:/mnt/f/Docker_Assignment# cat custom-index.html
+<html>
+<body>
+
+<h1>Hello World</h1>
+
+<p>I am Fardin khan</p>
+
+</body>
+</html>
+
+root@FARDIN:/mnt/f/Docker_Assignment#
+root@FARDIN:/mnt/f/Docker_Assignment#
+root@FARDIN:/mnt/f/Docker_Assignment#
+root@FARDIN:/mnt/f/Docker_Assignment# git branch -l
+  main
+* release
+root@FARDIN:/mnt/f/Docker_Assignment#
+root@FARDIN:/mnt/f/Docker_Assignment# docker container run -itd -p 8383:80 --name practice_container fardin31/fardin_cloudethix_nginx:v1
+7a2ceb9cd127dec877e309462d9c611c7d40cd077ababc1f3e4fd548f0d0812d
+root@FARDIN:/mnt/f/Docker_Assignment# docker container ls
+CONTAINER ID   IMAGE                                 COMMAND                  CREATED          STATUS          PORTS
+                  NAMES
+7a2ceb9cd127   fardin31/fardin_cloudethix_nginx:v1   "/docker-entrypoint.…"   15 seconds ago   Up 14 seconds   0.0.0.0:8383->80/tcp, :::8383->80/tcp   practice_container
+9f8d65a1c383   httpd                                 "sleep 20"               6 days ago       Up 17 seconds   80/tcp
+                  my_test_httpd_container_03
+
+root@FARDIN:/mnt/f/Docker_Assignment# curl localhost:8383
+<html>
+<body>
+
+<h1>Hello World</h1>
+
+<p>I am Fardin khan</p>
+
+</body>
+</html>
+root@FARDIN:/mnt/f/Docker_Assignment#
+
+root@FARDIN:/mnt/f/Docker_Assignment# git push origin release
+Total 0 (delta 0), reused 0 (delta 0), pack-reused 0
+remote:
+remote: Create a pull request for 'release' on GitHub by visiting:
+remote:      https://github.com/Fardin31/Docker_Assignment/pull/new/release
+remote:
+To github.com:Fardin31/Docker_Assignment.git
+ * [new branch]      release -> release
+root@FARDIN:/mnt/f/Docker_Assignment#
+
+				  
+========================================================================================				  
+				  
+03. Save all local Redis images as a .tar file in the master branch of your local repository. 
+             Delete all Redis images from your local system and push the master branch to the remote repository. 
+             Load the Redis images from the tar file to your local system, and verify that all images have been loaded correctly.
+			 
+ANS:- 
+
+root@FARDIN:/mnt/f/Docker_Assignment# git checkout -b master
+Switched to a new branch 'master'
+
+root@FARDIN:/mnt/f/Docker_Assignment#
+root@FARDIN:/mnt/f/Docker_Assignment#
+root@FARDIN:/mnt/f/Docker_Assignment# git branch -l
+  main
+* master
+  release
+root@FARDIN:/mnt/f/Docker_Assignment# ll
+total 0
+drwxrwxrwx 1 root root 512 Jan 17  2024 ./
+drwxrwxrwx 1 root root 512 Jan 17  2024 ../
+drwxrwxrwx 1 root root 512 Jan 17  2024 .git/
+-rwxrwxrwx 1 root root  74 Jan 17  2024 Dockerfile*
+-rwxrwxrwx 1 root root  19 Jan 17  2024 README.md*
+-rwxrwxrwx 1 root root  78 Jan 17  2024 custom-index.html*
+root@FARDIN:/mnt/f/Docker_Assignment# docker image save fardin31/fardin_cloudethix_redis:v1 -o redis_v1.tar
+root@FARDIN:/mnt/f/Docker_Assignment# docker image save fardin31/fardin_cloudethix_redis:v3 -o redis_v3.tar
+root@FARDIN:/mnt/f/Docker_Assignment# ll
+total 277696
+drwxrwxrwx 1 root root       512 Jan 17  2024 ./
+drwxrwxrwx 1 root root       512 Jan 17  2024 ../
+drwxrwxrwx 1 root root       512 Jan 17  2024 .git/
+-rwxrwxrwx 1 root root        74 Jan 17  2024 Dockerfile*
+-rwxrwxrwx 1 root root        19 Jan 17  2024 README.md*
+-rwxrwxrwx 1 root root        78 Jan 17  2024 custom-index.html*
+-rwxrwxrwx 1 root root 142179328 Jan 17  2024 redis_v1.tar*
+-rwxrwxrwx 1 root root 142179328 Jan 17  2024 redis_v3.tar*
+root@FARDIN:/mnt/f/Docker_Assignment#
+
+root@FARDIN:/mnt/f/Docker_Assignment# docker image rm fardin31/fardin_cloudethix_redis:v1
+Untagged: fardin31/fardin_cloudethix_redis:v1
+
+root@FARDIN:/mnt/f/Docker_Assignment# docker image rm fardin31/fardin_cloudethix_redis:v3
+Untagged: fardin31/fardin_cloudethix_redis:v3
+Untagged: fardin31/fardin_cloudethix_redis@sha256:5d5d31a84c7fec11a3c8a29b04b1712f650a98338f6a51152de42459ea24060b
+root@FARDIN:/mnt/f/Docker_Assignment# docker images
+REPOSITORY                           TAG       IMAGE ID       CREATED        SIZE
+fardin31/fardin_cloudethix_nginx     v1        d9b9c1a7763a   25 hours ago   187MB
+fardin31/fardin_docker_repo          latest    d9b9c1a7763a   25 hours ago   187MB
+my_test_image                        latest    e0a50a9c8ebd   5 days ago     584MB
+redis                                latest    bdff4838c172   7 days ago     138MB
+fardin31/fardin-cloudethix-busybox   v2        9211bbaa0dbd   4 weeks ago    4.26MB
+busybox                              latest    9211bbaa0dbd   4 weeks ago    4.26MB
+ubuntu                               latest    174c8c134b2a   5 weeks ago    77.9MB
+nginx                                latest    d453dd892d93   2 months ago   187MB
+httpd                                latest    6fd77d7e5eb7   2 months ago   167MB
+root@FARDIN:/mnt/f/Docker_Assignment#
+
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# tar -cvjf redis_v1.tar.bz2 redis_v1.tar
+redis_v1.tar
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# ls -lhrt
+total 314M
+-rwxrwxrwx 1 root root   74 Jan 17  2024 Dockerfile
+-rwxrwxrwx 1 root root   19 Jan 17  2024 README.md
+-rwxrwxrwx 1 root root   78 Jan 17  2024 custom-index.html
+-rwxrwxrwx 1 root root 136M Jan 17  2024 redis_v1.tar
+-rwxrwxrwx 1 root root 136M Jan 17  2024 redis_v3.tar
+-rwxrwxrwx 1 root root  43M Jan 17  2024 redis_v1.tar.bz2
+
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# tar -cvjf  redis_v3.tar.bz2 redis_v3.tar
+redis_v3.tar
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# ls -lhrt
+total 357M
+-rwxrwxrwx 1 root root   74 Jan 17  2024 Dockerfile
+-rwxrwxrwx 1 root root   19 Jan 17  2024 README.md
+-rwxrwxrwx 1 root root   78 Jan 17  2024 custom-index.html
+-rwxrwxrwx 1 root root 136M Jan 17  2024 redis_v1.tar
+-rwxrwxrwx 1 root root 136M Jan 17  2024 redis_v3.tar
+-rwxrwxrwx 1 root root  43M Jan 17  2024 redis_v1.tar.bz2
+-rwxrwxrwx 1 root root  43M Jan 17  2024 redis_v3.tar.bz2
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# rm -rf redis_v1.tar
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# rm -rf redis_v3.tar
+
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# git push origin master --force
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (4/4), done.
+Writing objects: 100% (4/4), 84.69 MiB | 1.17 MiB/s, done.
+Total 4 (delta 0), reused 0 (delta 0), pack-reused 0
+To github.com:Fardin31/Docker_Assignment.git
+ + dd12f60...991700b master -> master (forced update)
+
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# docker images
+REPOSITORY                           TAG       IMAGE ID       CREATED        SIZE
+fardin31/fardin_cloudethix_nginx     v1        d9b9c1a7763a   29 hours ago   187MB
+fardin31/fardin_docker_repo          latest    d9b9c1a7763a   29 hours ago   187MB
+my_test_image                        latest    e0a50a9c8ebd   6 days ago     584MB
+redis                                latest    bdff4838c172   7 days ago     138MB
+fardin31/fardin-cloudethix-busybox   v2        9211bbaa0dbd   4 weeks ago    4.26MB
+busybox                              latest    9211bbaa0dbd   4 weeks ago    4.26MB
+ubuntu                               latest    174c8c134b2a   5 weeks ago    77.9MB
+nginx                                latest    d453dd892d93   2 months ago   187MB
+httpd                                latest    6fd77d7e5eb7   3 months ago   167MB
+
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment#  docker image import redis_v1.tar.bz2  my_redis
+sha256:a677d42f545e01f2775c698ec01ed21c57dce347cb3fd93af3d4988dba0594fc
+
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment#  docker image import redis_v1.tar.bz2  my_redis_02
+sha256:7368db14898317b31e9b76792db0660add58399d8a5bf9abf69a59ef5b940613
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# docker images
+REPOSITORY                           TAG       IMAGE ID       CREATED              SIZE
+my_redis_02                          latest    7368db148983   32 seconds ago       142MB
+my_redis                             latest    a677d42f545e   About a minute ago   142MB
+fardin31/fardin_cloudethix_nginx     v1        d9b9c1a7763a   29 hours ago         187MB
+fardin31/fardin_docker_repo          latest    d9b9c1a7763a   29 hours ago         187MB
+my_test_image                        latest    e0a50a9c8ebd   6 days ago           584MB
+redis                                latest    bdff4838c172   7 days ago           138MB
+fardin31/fardin-cloudethix-busybox   v2        9211bbaa0dbd   4 weeks ago          4.26MB
+busybox                              latest    9211bbaa0dbd   4 weeks ago          4.26MB
+ubuntu                               latest    174c8c134b2a   5 weeks ago          77.9MB
+nginx                                latest    d453dd892d93   2 months ago         187MB
+httpd                                latest    6fd77d7e5eb7   3 months ago         167MB
+=================================================================================================
+ 
+			 
+04. Pull the Busy-box image to your local system, tag it, and push it to the Docker Hub repository "yourname_cloudethix_busybox." 
+             Export the Docker image from the NGINX container, create a .tar file, and import the tar file to create a Docker image with a meaningful name. 
+             After importing the image, tag it and push it to the "yourname_cloudethix_busybox" Docker Hub repository.
+ANS:- 
+root@FARDIN:/mnt/d/docker_work# docker image pull busybox
+Using default tag: latest
+latest: Pulling from library/busybox
+Digest: sha256:ba76950ac9eaa407512c9d859cea48114eeff8a6f12ebaa5d32ce79d4a017dd8
+Status: Downloaded newer image for busybox:latest
+docker.io/library/busybox:latest
+root@FARDIN:/mnt/d/docker_work# docker images
+REPOSITORY                           TAG       IMAGE ID       CREATED          SIZE
+fardin31/fardin_docker_repo          latest    d9b9c1a7763a   57 minutes ago   187MB
+my_test_image                        latest    e0a50a9c8ebd   4 days ago       584MB
+fardin31/fardin-cloudethix-busybox   v2        9211bbaa0dbd   4 weeks ago      4.26MB
+busybox                              latest    9211bbaa0dbd   4 weeks ago      4.26MB
+ubuntu                               latest    174c8c134b2a   4 weeks ago      77.9MB
+nginx                                latest    d453dd892d93   2 months ago     187MB
+httpd                                latest    6fd77d7e5eb7   2 months ago     167MB
+
+
+root@FARDIN:~# docker image tag busybox:latest fardin31/fardin-cloudethix-busybox:v2
+root@FARDIN:~# docker image ls
+REPOSITORY                           TAG       IMAGE ID       CREATED        SIZE
+fardin31/fardin_docker_repo          v1        e0a50a9c8ebd   4 days ago     584MB
+fardin31/fardin_docker_repo          v2        e0a50a9c8ebd   4 days ago     584MB
+my_test_image                        latest    e0a50a9c8ebd   4 days ago     584MB
+busybox                              latest    9211bbaa0dbd   4 weeks ago    4.26MB
+fardin31/fardin-cloudethix-busybox   v2        9211bbaa0dbd   4 weeks ago    4.26MB
+ubuntu                               latest    174c8c134b2a   4 weeks ago    77.9MB
+nginx                                latest    d453dd892d93   2 months ago   187MB
+httpd                                latest    6fd77d7e5eb7   2 months ago   167MB
+    
+
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# docker container run --name my_nginx  nginx
+Unable to find image 'nginx:latest' locally
+latest: Pulling from library/nginx
+2f44b7a888fa: Already exists
+8b7dd3ed1dc3: Pull complete
+35497dd96569: Pull complete
+36664b6ce66b: Pull complete
+2d455521f76c: Pull complete
+dc9c4fdb83d6: Pull complete
+8056d2bcf3b6: Pull complete
+Digest: sha256:4c0fdaa8b6341bfdeca5f18f7837462c80cff90527ee35ef185571e1c327beac
+Status: Downloaded newer image for nginx:latest
+
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# docker container ls -a
+CONTAINER ID   IMAGE                                 COMMAND                  CREATED         STATUS                      PORTS                                   NAMES
+4a449ba18d4d   nginx                                 "/docker-entrypoint.…"   4 minutes ago   Exited (0) 25 seconds ago
+                             my_nginx
+
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# docker export my_nginx >my_ngnix.tar
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment#
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# docker image import my_ngnix.tar my_ngnix_image
+sha256:d082cef459bb4b7fe293095566082919fbc48ad758c5e16a444bbb2be6c3c406
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment#
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment#
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# docker images
+REPOSITORY                           TAG       IMAGE ID       CREATED          SIZE
+my_ngnix_image                       latest    d082cef459bb   9 seconds ago    185MB
+my_redis_02                          latest    7368db148983   41 minutes ago   142MB
+my_redis                             latest    a677d42f545e   42 minutes ago   142MB
+
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# docker image tag my_ngnix_image  fardin31/fardin-cloudethix-busybox:v1
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# docker images
+REPOSITORY                           TAG       IMAGE ID       CREATED             SIZE
+my_redis_02                          latest    7368db148983   About an hour ago   142MB
+my_redis                             latest    a677d42f545e   About an hour ago   142MB
+fardin31/fardin_cloudethix_nginx     v1        d9b9c1a7763a   30 hours ago        187MB
+fardin31/fardin_docker_repo          latest    d9b9c1a7763a   30 hours ago        187MB
+my_test_image                        latest    e0a50a9c8ebd   6 days ago          584MB
+redis                                latest    bdff4838c172   7 days ago          138MB
+fardin31/fardin-cloudethix-busybox   v2        9211bbaa0dbd   4 weeks ago         4.26MB
+busybox                              latest    9211bbaa0dbd   4 weeks ago         4.26MB
+ubuntu                               latest    174c8c134b2a   5 weeks ago         77.9MB
+fardin31/fardin-cloudethix-busybox   v1        a8758716bb6a   2 months ago        187MB
+my_ngnix_image                       latest    a8758716bb6a   2 months ago        187MB
+nginx                                latest    a8758716bb6a   2 months ago        187MB
+httpd                                latest    6fd77d7e5eb7   3 months ago        167MB
+
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment# docker image push fardin31/fardin-cloudethix-busybox:v1
+The push refers to repository [docker.io/fardin31/fardin-cloudethix-busybox]
+009507b85609: Mounted from library/nginx
+fbcc9bc44d3e: Mounted from library/nginx
+b4ad47845036: Mounted from library/nginx
+eddcd06e5ef9: Mounted from library/nginx
+b61d4b2cd2da: Mounted from library/nginx
+b6c2a8d6f0ac: Mounted from library/nginx
+571ade696b26: Mounted from fardin31/fardin_cloudethix_redis
+v1: digest: sha256:9ceac672f55cdad7316651fcced0d6a1ba44e87454ec86236cb3bca647e419f6 size: 1778
+================================================================================================
+
+							 
+	05. Dockerfile creation: Create a simple Dockerfile to build a custom image with the following specifications:
+			1. Base image: Ubuntu
+			2. Install packages: curl, vim, and git
+		    3. Set an environment variable: MY_NAME=Your_Name
+			4. Build the custom image using docker build and list all available images using docker images.
+ANS:- 
+
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment/test# cat Dockerfile
+FROM ubuntu:latest
+RUN apt update
+RUN apt install curl -y
+RUN apt install vim -y
+RUN apt install git -y
+ENV MY_NAME=fardin_pathan
+
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment/test# docker image build -t my_image .
+[+] Building 42.5s (9/9) FINISHED                                                                                     docker:default
+ => [internal] load build definition from Dockerfile                                                                            0.1s
+ => => transferring dockerfile: 171B                                                                                            0.0s
+ => [internal] load .dockerignore                                                                                               0.1s
+ => => transferring context: 2B                                                                                                 0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:latest                                                                0.0s
+ => [1/5] FROM docker.io/library/ubuntu:latest                                                                                  0.0s
+ => [2/5] RUN apt update                                                                                                        8.3s
+ => [3/5] RUN apt install curl -y                                                                                               9.2s
+ => [4/5] RUN apt install vim -y                                                                                               10.2s
+ => [5/5] RUN apt install git -y                                                                                               14.0s
+ => exporting to image                                                                                                          0.5s
+ => => exporting layers                                                                                                         0.5s
+ => => writing image sha256:42772c847c5eae7011de3d24151b91e054d904e5d8e3ccc6997774ab20da266e                                    0.0s
+ => => naming to docker.io/library/my_image                                                                                     0.0s
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment/test# docker images
+REPOSITORY                           TAG       IMAGE ID       CREATED             SIZE
+my_image                             latest    42772c847c5e   16 seconds ago      261MB
+my_redis_02                          latest    7368db148983   About an hour ago   142MB
+my_redis                             latest    a677d42f545e   About an hour ago   142MB
+fardin31/fardin_docker_repo          latest    d9b9c1a7763a   30 hours ago        187MB
+fardin31/fardin_cloudethix_nginx     v1        d9b9c1a7763a   30 hours ago        187MB
+my_test_image                        latest    e0a50a9c8ebd   6 days ago          584MB
+redis                                latest    bdff4838c172   7 days ago          138MB
+busybox                              latest    9211bbaa0dbd   4 weeks ago         4.26MB
+fardin31/fardin-cloudethix-busybox   v2        9211bbaa0dbd   4 weeks ago         4.26MB
+ubuntu                               latest    174c8c134b2a   5 weeks ago         77.9MB
+fardin31/fardin-cloudethix-busybox   v1        a8758716bb6a   2 months ago        187MB
+my_ngnix_image                       latest    a8758716bb6a   2 months ago        187MB
+nginx                                latest    a8758716bb6a   2 months ago        187MB
+httpd                                latest    6fd77d7e5eb7   3 months ago        167MB
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment/test# docker container run -itd --name my_container my_image:latest
+1776f7bd53694f7e4216f7c09f2b0b4a1790d8ac1f0be0dfa5e2e1812c86793e
+
+root@FARDIN:/mnt/f/docker_assignment/Docker_Assignment/test# docker container exec -it my_container /bin/bash
+root@1776f7bd5369:/# echo $MY_NAME
+fardin_pathan
+root@1776f7bd5369:/#
+
+===============================================================================================
+
+			
